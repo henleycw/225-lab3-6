@@ -1,0 +1,22 @@
+FROM python:3.9-slim
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+ wget \
+ curl \
+ firefox-esr \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN wget -q "https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz" -O /tmp/geckodriver.tar.gz \
+ && tar -xzf /tmp/geckodriver.tar.gz -C /usr/local/bin \
+ && rm /tmp/geckodriver.tar.gz \
+ && chmod +x /usr/local/bin/geckodriver
+
+CMD ["python", "test_html_elements.py"]

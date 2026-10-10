@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-deployment
+spec:
+  replicas: 1  # Number of NGINX pods to run
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: cithit/roseaw:latest            #<-------------change this!!!!
+        ports:
+        - containerPort: 80  # Expose NGINX on port 80        
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+spec:
+  rules: 
+  - host: 
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend: 
+          service:
+            name: dev-service
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+
